@@ -1,0 +1,7 @@
+.DS_Store
+.env*
+tmp
+Procfile
+queries/*.go
+dist
+mina-archive-proxy
