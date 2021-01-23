@@ -2,6 +2,16 @@
 
 Archive data API for Mina
 
+## Usage
+
+```bash
+Usage of ./mina-archive-proxy:
+  -coda-bin string
+    	Full path to Coda binary
+  -ledger-enabled
+    	Enable staking ledger dump endpoint (default true)
+```
+
 ## API Reference
 
 | Method | Path             | Description

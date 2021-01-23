@@ -17,7 +17,8 @@ var cmdOpts = struct {
 
 func init() {
 	flag.StringVar(&cmdOpts.codaBin, "coda-bin", "", "Full path to Coda binary")
-	flag.BoolVar(&cmdOpts.ledgerEnabled, "ledger-endpoint", false, "Enable staking ledger dump endpoint")
+	flag.BoolVar(&cmdOpts.ledgerEnabled, "ledger-enabled", true, "Enable staking ledger dump endpoint")
+	flag.Parse()
 
 	gin.SetMode(gin.ReleaseMode)
 }
