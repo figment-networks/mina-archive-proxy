@@ -25,3 +25,7 @@ Usage of ./mina-archive-proxy:
 | GET    | /public_keys     | Get all public keys
 | GET    | /public_keys/:id | Get public keys details by value
 | GET    | /staking_ledger  | Get staking ledger dump
+
+## License
+
+Apache License v2.0
