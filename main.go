@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"os"
 
@@ -10,12 +11,18 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 )
 
+const (
+	version = "0.1.0"
+)
+
 var cmdOpts = struct {
 	codaBin       string
 	ledgerEnabled bool
+	showVersion   bool
 }{}
 
 func init() {
+	flag.BoolVar(&cmdOpts.showVersion, "version", false, "Show version")
 	flag.StringVar(&cmdOpts.codaBin, "coda-bin", "", "Full path to Coda binary")
 	flag.BoolVar(&cmdOpts.ledgerEnabled, "ledger-enabled", true, "Enable staking ledger dump endpoint")
 	flag.Parse()
@@ -24,6 +31,11 @@ func init() {
 }
 
 func main() {
+	if cmdOpts.showVersion {
+		fmt.Println(version)
+		return
+	}
+
 	log.Println("connecting to database...")
 	conn, err := gorm.Open("postgres", os.Getenv("DATABASE_URL"))
 	if err != nil {
