@@ -7,6 +7,7 @@ SELECT
   creator_keys.value AS creator,
   winnder_keys.value AS winner,
   blocks.timestamp,
+  to_char(to_timestamp(blocks.timestamp / 1000), 'YYYY-MM-DD"T"HH24:MI:SS:MS"Z"') AS timestamp_formatted,
   blocks.global_slot_since_genesis,
   blocks.global_slot,
   {{ array }}

@@ -8,15 +8,17 @@ SELECT
   (SELECT COUNT(1) FROM public_keys) AS public_keys_count,
   (SELECT COUNT(1) FROM internal_commands) AS internal_commands_count,
   (SELECT COUNT(1) FROM user_commands) AS user_commands_count,
-  {{ array }}
-    SELECT type, COUNT(1)
-    FROM user_commands
-    GROUP BY type
-  {{ end_array }} AS user_commands_types,
-  {{ array }}
-    SELECT type, COUNT(1)
-    FROM internal_commands
-    GROUP BY type
-  {{ end_array }} AS internal_commands_types
+  (
+    SELECT json_object_agg(key, value)
+    FROM (
+      SELECT json_build_object(type, COUNT(1)) AS data FROM user_commands GROUP BY type
+    ) t, json_each(data)
+  ) AS user_commands_types,
+  (
+    SELECT json_object_agg(key, value)
+    FROM (
+      SELECT json_build_object(type, COUNT(1)) AS data FROM internal_commands GROUP BY type
+    ) t, json_each(data)
+  ) AS internal_commands_types
 FROM
   blocks

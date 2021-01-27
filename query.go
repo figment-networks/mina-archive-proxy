@@ -1,6 +1,8 @@
 package main
 
 import (
+	"database/sql"
+
 	"github.com/figment-networks/indexing-engine/store/jsonquery"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
@@ -34,4 +36,29 @@ func renderObjectQuery(ctx *gin.Context, conn *gorm.DB, query string, args ...in
 
 func renderArrayQuery(ctx *gin.Context, conn *gorm.DB, query string, args ...interface{}) {
 	renderQuery(ctx, conn, "array", query, args...)
+}
+
+func renderRawQuery(ctx *gin.Context, conn *gorm.DB, query string, args ...interface{}) {
+	result, err := scanBytes(conn.Raw(query, args...).Rows())
+	if err != nil {
+		ctx.AbortWithStatusJSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	ctx.Data(200, "application/json", result)
+}
+
+func scanBytes(rows *sql.Rows, err error) ([]byte, error) {
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var data []byte
+	for rows.Next() {
+		if err := rows.Scan(&data); err != nil {
+			return nil, err
+		}
+	}
+
+	return data, nil
 }

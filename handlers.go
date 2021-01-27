@@ -62,7 +62,7 @@ func handleBlock(conn *gorm.DB) gin.HandlerFunc {
 
 func handleBlockProducers(conn *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		renderArrayQuery(c, conn, queries.BlockProducers)
+		renderRawQuery(c, conn, queries.BlockProducers)
 	}
 }
 
@@ -80,7 +80,7 @@ func handleInternalCommands(conn *gorm.DB) gin.HandlerFunc {
 
 func handlePublicKeys(conn *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		renderObjectQuery(c, conn, queries.PublicKeys)
+		renderRawQuery(c, conn, queries.PublicKeys)
 	}
 }
 
