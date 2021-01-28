@@ -12,7 +12,7 @@ SELECT
   blocks.global_slot,
   {{ array }}
     SELECT
-      (hash || '-' || sequence_no || '-' || secondary_sequence_no) AS id,
+      (hash || '-' || sequence_no) AS id,
       hash,
       type,
       fee,
