@@ -12,6 +12,7 @@ SELECT
   blocks.global_slot,
   {{ array }}
     SELECT
+      (hash || '-' || sequence_no || '-' || secondary_sequence_no) AS id,
       hash,
       type,
       fee,
@@ -28,7 +29,7 @@ SELECT
     WHERE
       blocks_internal_commands.block_id = blocks.id
     ORDER BY
-      blocks_internal_commands.internal_command_id ASC
+      blocks_internal_commands.secondary_sequence_no ASC, blocks_internal_commands.sequence_no ASC
   {{ end_array }} AS internal_commands,
   {{ array }}
     SELECT
