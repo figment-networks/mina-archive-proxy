@@ -18,6 +18,7 @@ const (
 var cmdOpts = struct {
 	codaBin       string
 	ledgerEnabled bool
+	corsEnabled   bool
 	showVersion   bool
 }{}
 
@@ -25,6 +26,7 @@ func init() {
 	flag.BoolVar(&cmdOpts.showVersion, "version", false, "Show version")
 	flag.StringVar(&cmdOpts.codaBin, "coda-bin", "", "Full path to Coda binary")
 	flag.BoolVar(&cmdOpts.ledgerEnabled, "ledger-enabled", true, "Enable staking ledger dump endpoint")
+	flag.BoolVar(&cmdOpts.corsEnabled, "cors-enabled", true, "Enable CORS on the server")
 	flag.Parse()
 
 	gin.SetMode(gin.ReleaseMode)
@@ -47,6 +49,15 @@ func main() {
 	conn.LogMode(os.Getenv("TRACE_SQL") == "1")
 
 	router := gin.Default()
+
+	if cmdOpts.corsEnabled {
+		router.Use(func(c *gin.Context) {
+			c.Header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+			c.Header("Access-Control-Expose-Headers", "*")
+			c.Header("Access-Control-Allow-Origin", "*")
+		})
+	}
+
 	router.GET("/", handleInfo(conn))
 	router.GET("/status", handleStatus(conn))
 	router.GET("/chain", handleChain(conn))

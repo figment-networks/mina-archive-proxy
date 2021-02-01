@@ -1,4 +1,4 @@
-.PHONY: build queries dist setup
+.PHONY: build queries dist setup swagger
 
 build: queries
 	go build
@@ -15,3 +15,6 @@ setup:
 
 dist: queries
 	GOOS=linux GOARCH=amd64 go build -o ./dist/mina-archive-proxy
+
+swagger:
+	swagger serve ./swagger.yml

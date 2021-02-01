@@ -1,0 +1,471 @@
+swagger: "2.0"
+
+info:
+  description: "HTTP API service providing access to the Mina Archive database, backed by PostgreSQL."
+  version: "0.2.1"
+  title: "Mina Archive API"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+
+host: "localhost:5080"
+
+schemes:
+  - http
+
+produces:
+  - "application/json"
+
+paths:
+  /:
+    get:
+      summary: "Fetch summary"
+      description: "Summary endpoint returns aggregate information on all data available in the archive database"
+      responses:
+        200:
+          description: Operation is successful
+          schema:
+            $ref: "#/definitions/Summary"
+
+  /status:
+    get:
+      summary: "Fetch service status"
+      responses:
+        200:
+          description: Operation is successful
+          schema:
+            $ref: "#/definitions/ServiceStatus"
+
+  /blocks:
+    get:
+      summary: "Fetch blocks"
+      parameters:
+        - in: query
+          name: canonical
+          type: boolean
+          description: Only include blocks on canonical chain
+          default: false
+        - in: query
+          name: start_height
+          type: integer
+          description: Starting block height
+          default: 0
+        - in: query
+          name: limit
+          type: integer
+          description: Number of blocks to returns in results
+          default: 100
+        - in: query
+          name: creator
+          type: string
+          description: Filter blocks by creator public key
+      responses:
+        200:
+          description: Operation is successful
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/BlockSummary"
+
+  /blocks/{hash}:
+    get:
+      summary: "Fetch block details"
+      parameters:
+        - in: path
+          required: true
+          name: hash
+          type: string
+          description: Block state hash
+      responses:
+        200:
+          description: Block exists
+          schema:
+            $ref: "#/definitions/Block"
+        400:
+          description: Block does not exist
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                description: Error message
+                example: "record not found"
+
+  /chain:
+    get:
+      summary: "Fetch chain"
+      parameters:
+        - in: query
+          name: canonical
+          type: boolean
+          description: Only return canonical chain
+          default: false
+        - in: query
+          name: start_height
+          type: integer
+          description: Starting chain height
+          default: 0
+        - in: query
+          name: limit
+          type: integer
+          description: Number of rows to return
+          default: 100
+      responses:
+        200:
+          description: Operation is successful
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Chain"
+
+  /block_producers:
+    get:
+      summary: Fetch all block producers
+      responses:
+        200:
+          description: Operation is successful
+          schema:
+            type: object
+            example:
+              publickey1:
+                blocks_produced: 1234
+                first_block: 1
+                last_block: 100
+  /public_keys:
+    get:
+      summary:  Fetch all public keys
+      responses:
+        200:
+          description: Operation is successful
+          schema:
+            type: array
+            items:
+              type: object
+            example:
+              - publickey1
+              - publickey2
+              - publickey3
+  /public_keys/{id}:
+    get:
+      summary: Fetch public key details
+      parameters:
+        - in: path
+          type: string
+          required: true
+          name: id
+      responses:
+        200:
+          description: Operation is successful
+          schema:
+            type: object
+            properties:
+              id:
+                type: string
+                description: Public key id
+                example: B62qiy32p8kAKnny8ZFwoMhYpBppM1DWVCqAPBYNcXnsAHhnfAAuXgg
+              commands_sent:
+                type: integer
+                description: Number of user commands sent
+                example: 100
+              commands_received:
+                type: integer
+                description: Number of user commands received
+                example: 200
+        404:
+          description: Public key does not exist
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                description: Error message
+                example: "record not found"
+  /staking_ledger:
+    get:
+      summary: Fetch stacking ledger
+      parameters:
+        - in: query
+          name: type
+          type: string
+          enum:
+            - current
+            - next
+          default: current
+          description: Staking ledger to return
+      responses:
+        200:
+          description: Operation is successful
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/StakingLedger"
+        400:
+          description: Operation failed
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                description: Error message
+                example: "cant fetch ledger"
+
+definitions:
+  ServiceStatus:
+    type: object
+    properties:
+      healthy:
+        type: boolean
+        example: true
+
+  Summary:
+    type: object
+    properties:
+      blocks_count:
+        type: integer
+        example: 100
+      blocks_min_height:
+        type: integer
+        example: 0
+      blocks_min_timestamp:
+        type: integer
+        example: 0
+      blocks_max_height:
+        type: integer
+        example: 400
+      block_max_timestamp:
+        type: integer
+        example: 1612035690000
+      blocks_producers_count:
+        type: integer
+        example: 100
+      public_keys_count:
+        type: integer
+        example: 200
+      internal_commands_count:
+        type: integer
+        example: 12345
+      user_commands_count:
+        type: integer
+        example: 100
+      user_commands_types:
+        type: object
+        example:
+          payment: 230998
+          delegation: 26
+      internal_commands_types:
+        type: object
+        example:
+          coinbase: 1433
+          fee_transfer_via_coinbase: 264
+          fee_transfer: 17757
+
+  Chain:
+    type: object
+    properties:
+      height:
+        type: integer
+        description: Block height
+        example: 4854
+      state_hash:
+        type: string
+        description: Block hash
+        example: 3NKFMLfJ9GvSQCeyPWuuHTkKHymJy8CS2NoX7BjVtiyV11zd5mrz
+      parent_hash:
+        type: string
+        description: Block parent hash
+        example: 3NLdbZhcVHj8Yk6tD3sDjbFRyRj2Q93ibYB4Sa2HkXPLk1ECCBvC
+      timestamp:
+        type: integer
+        description: Block timestamp (Unix Nano)
+        example: 1612194990000
+
+  BlockSummary:
+    type: object
+    properties:
+      height:
+        type: integer
+        example: 1620
+      state_hash:
+        type: string
+        example: 3NKiqbSk22VYFi8ZUFpMYrZvUu9rFvExC7wda4n71bxsYKu1Qscb
+      parent_hash:
+        type: string
+        example: 3NK8iG3hpYjqBpqa9dd3QJCdBoujHfd4MafAKKcvzHJMnMRSdmZu
+      ledger_hash:
+        type: string
+        example: jwvkYSSYYfgU5jnmtMrWfNCB4GtxdhBtrDMd2eNatH47qAnrak4
+      snarked_ledger_hash:
+        type: string
+        example: jxvSd2aKXNFrypunaWn9sFakmAB8B8YWTratqmuCxLp43T1sCTY
+      creator:
+        type: string
+        example: B62qkCf7QM2bQsuP8CE1Cuyq6TyqnPj5K8Fx5UgJuEcvHEJWoSCwp2Z
+      winner:
+        type: string
+        example: B62qkCf7QM2bQsuP8CE1Cuyq6TyqnPj5K8Fx5UgJuEcvHEJWoSCwp2Z
+      timestamp:
+        type: integer
+        example: 1610575710000
+      timestamp_formatted:
+        type: string
+        example: 2021-01-13T22:08:30:000Z
+      global_slot_since_genesis:
+        type: integer
+        example: 6778
+      global_slot:
+        type: integer
+        example: 6778
+
+  Block:
+    type: object
+    allOf:
+      - $ref: '#/definitions/BlockSummary'
+    properties: 
+      internal_commands:
+        type: array
+        items:
+          $ref: "#/definitions/InternalCommand"
+      user_commands:
+        type: array
+        items:
+          $ref: "#/definitions/UserCommand"
+
+  InternalCommand:
+    type: object
+    properties:
+      id:
+        type: string
+        description: Unique command ID
+        example: Ckpa2vhWFTjmQBxNVKTsTn1X7Kd7zH6cQyy4TFFnp5r8WNbEC5Aum-19
+      hash:
+        type: string
+        description: Command hash
+        example: Ckpa2vhWFTjmQBxNVKTsTn1X7Kd7zH6cQyy4TFFnp5r8WNbEC5Aum
+      type:
+        type: string
+        enum:
+          - coinbase
+          - fee_transfer
+          - fee_transfer_via_coinbase
+        description: Command type
+        example: fee_transfer
+      token:
+        type: integer
+        description: Token ID
+        example: 1
+      receiver:
+        type: string
+        description: Receiver public key
+        example: B62qqx6zhqyNHWgbGBZtsYLKqh75kf2UzfuvKexnDHKNfhVD7ShfBPi
+      sequence_no:
+        type: integer
+        description: Internal command sequence number
+        example: 19
+      secondary_sequence_no:
+        type: integer
+        description: Internal command secondary sequence number
+        example: 0
+
+  UserCommand:
+    type: object
+    properties:
+      hash:
+        type: string
+        description: User command hash
+        example: CkpZY11iXwRpbZwGHGexjEmwwxbDuL1kAUAdqJPj3Lmw9cU5kcbvi
+      type:
+        type: string
+        enum:
+          - payment
+          - delegation
+        description: User command type
+        example: payment
+      fee_token:
+        type: integer
+        description: Fee token
+        example: 1
+      token:
+        type: integer
+        description: Token
+        example: 1
+      nonce:
+        type: integer
+        description: User command nonce
+        example: 853
+      amount:
+        type: integer
+        description: User command amount
+        example: 10000000
+      fee:
+        type: integer
+        description: User command fee
+        example: 100000000
+      memo:
+        type: string
+        description: Base58 representation of the text memo
+        example: E4YM2vTHhWEg66xpj52JErHUBU4pZ1yageL4TVDDpTTSsv8mK6YaH
+      status:
+        type: string
+        enum:
+          - applied
+          - failure
+        description: User command status
+        example: applied
+      failure_reason:
+        type: string
+        description: User command failure reason text
+        example: null
+      valid_until:
+        type: integer
+        description: User command deadline timestamp
+        example: null
+      sequence_no:
+        type: integer
+        description: User command internal sequence number
+        example: 107
+      fee_payer:
+        type: string
+        description: Fee payer public key
+        example: B62qm474izsLKFVdGygakFi5TK1bfiFBBRQyF7dt7ZQgivJHC416Rsv
+      sender:
+        type: string
+        description: User command sender public key
+        example: B62qm474izsLKFVdGygakFi5TK1bfiFBBRQyF7dt7ZQgivJHC416Rsv
+      receiver:
+        type: string
+        description: User command receiver public key
+        example: B62qm474izsLKFVdGygakFi5TK1bfiFBBRQyF7dt7ZQgivJHC416Rsv
+        
+  StakingLedger:
+    type: object
+    properties:
+      pk:
+        type: string
+        example: B62qiy32p8kAKnny8ZFwoMhYpBppM1DWVCqAPBYNcXnsAHhnfAAuXgg
+      balance:
+        type: string
+        example: "7.645501"
+      delegate:
+        type: string
+        example: B62qiy32p8kAKnny8ZFwoMhYpBppM1DWVCqAPBYNcXnsAHhnfAAuXgg
+      token:
+        type: string
+        example: "1"
+      token_permissions:
+        type: object
+        example:
+      receipt_chain_hash:
+        type: string
+        example: 2mzbV7WevxLuchs2dAMY4vQBS6XttnCUF8Hvks4XNBQ5qiSGGBQe
+      voting_for:
+        type: string
+        example: 3NK2tkzqqK5spR2sZ7tujjqPksL45M3UUrcA4WhCkeiPtnugyE2x
+      permissions:
+        type: object
+        example:
+          stake: true
+          edit_state: signature
+          send: signature
+          set_delegate: signature
+          set_permissions: signature
+          set_verification_key: signature
