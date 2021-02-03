@@ -24,7 +24,7 @@ var cmdOpts = struct {
 
 func init() {
 	flag.BoolVar(&cmdOpts.showVersion, "version", false, "Show version")
-	flag.StringVar(&cmdOpts.codaBin, "coda-bin", "", "Full path to Coda binary")
+	flag.StringVar(&cmdOpts.codaBin, "coda-bin", "coda", "Full path to Coda binary")
 	flag.BoolVar(&cmdOpts.ledgerEnabled, "ledger-enabled", true, "Enable staking ledger dump endpoint")
 	flag.BoolVar(&cmdOpts.corsEnabled, "cors-enabled", true, "Enable CORS on the server")
 	flag.Parse()

@@ -102,21 +102,20 @@ func handleStatus(conn *gorm.DB) gin.HandlerFunc {
 	}
 }
 
-// TODO: move ledger dumping into background, run the command every 60s
 func handleStakingLedger(codaBinPath string) gin.HandlerFunc {
-	if codaBinPath == "" {
-		codaBinPath = "coda"
-	}
-
 	return func(c *gin.Context) {
-		ledgerType := "current"
-		if c.Query("type") == "next" {
-			ledgerType = "next"
+		ledgerType := c.Query("type")
+		if ledgerType == "" {
+			ledgerType = "current"
+		}
+		if !(ledgerType == "current" || ledgerType == "next") {
+			c.AbortWithStatusJSON(400, gin.H{"error": "invalid ledger type"})
+			return
 		}
 
 		ledgerbuf := bytes.NewBuffer(nil)
 
-		ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+		ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
 		defer cancel()
 
 		cmd := exec.CommandContext(ctx, codaBinPath, "advanced", "dump-staking-ledger", ledgerType, "-json")
