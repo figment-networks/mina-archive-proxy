@@ -357,6 +357,10 @@ definitions:
         type: string
         description: Receiver public key
         example: B62qqx6zhqyNHWgbGBZtsYLKqh75kf2UzfuvKexnDHKNfhVD7ShfBPi
+      receiver_balance:
+        type: integer
+        description: Receiver balance
+        example: 10000000
       sequence_no:
         type: integer
         description: Internal command sequence number
@@ -427,15 +431,27 @@ definitions:
         type: string
         description: Fee payer public key
         example: B62qm474izsLKFVdGygakFi5TK1bfiFBBRQyF7dt7ZQgivJHC416Rsv
+      fee_payer_balance:
+        type: integer
+        description: Fee payer balance
+        example: 10000000
       sender:
         type: string
         description: User command sender public key
         example: B62qm474izsLKFVdGygakFi5TK1bfiFBBRQyF7dt7ZQgivJHC416Rsv
+      sender_balance:
+        type: integer
+        description: Sender balance
+        example: 10000000
       receiver:
         type: string
         description: User command receiver public key
         example: B62qm474izsLKFVdGygakFi5TK1bfiFBBRQyF7dt7ZQgivJHC416Rsv
-        
+      receiver_balance:
+        type: integer
+        description: Receiver balance
+        example: 10000000
+
   StakingLedger:
     type: object
     properties:
