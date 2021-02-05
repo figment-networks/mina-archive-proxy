@@ -18,6 +18,7 @@ SELECT
       fee,
       token,
       receivers.value AS receiver,
+      balances.balance AS receiver_balance,
       blocks_internal_commands.sequence_no,
       blocks_internal_commands.secondary_sequence_no
     FROM
@@ -26,6 +27,8 @@ SELECT
       ON internal_commands.id = blocks_internal_commands.internal_command_id
     INNER JOIN public_keys receivers
       ON receivers.id = internal_commands.receiver_id
+    INNER JOIN balances
+      ON balances.id = blocks_internal_commands.receiver_balance
     WHERE
       blocks_internal_commands.block_id = blocks.id
     ORDER BY
@@ -49,8 +52,11 @@ SELECT
       created_token,
       blocks_user_commands.sequence_no,
       fee_payers.value AS fee_payer,
+      fee_payer_balances.balance AS fee_payer_balance,
       senders.value AS sender,
+      sender_balances.balance AS sender_balance,
       receivers.value AS receiver,
+      receiver_balances.balance AS receiver_balance,
       blocks_user_commands.sequence_no
     FROM
       blocks_user_commands
@@ -62,6 +68,12 @@ SELECT
       ON fee_payers.id = user_commands.fee_payer_id
     INNER JOIN public_keys receivers
       ON receivers.id = user_commands.receiver_id
+    INNER JOIN balances fee_payer_balances
+      ON fee_payer_balances.id = blocks_user_commands.fee_payer_balance
+    INNER JOIN balances sender_balances
+      ON sender_balances.id = blocks_user_commands.source_balance
+    INNER JOIN balances receiver_balances
+      ON receiver_balances.id = blocks_user_commands.receiver_balance
     WHERE
       blocks_user_commands.block_id = blocks.id
     ORDER BY
