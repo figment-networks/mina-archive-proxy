@@ -2,7 +2,7 @@ swagger: "2.0"
 
 info:
   description: "HTTP API service providing access to the Mina Archive database, backed by PostgreSQL."
-  version: "0.2.1"
+  version: "0.3.0"
   title: "Mina Archive API"
   license:
     name: "Apache 2.0"

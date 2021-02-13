@@ -16,18 +16,30 @@ const (
 )
 
 var cmdOpts = struct {
+	connStr       string
 	codaBin       string
 	ledgerEnabled bool
 	corsEnabled   bool
 	showVersion   bool
+	debug         bool
 }{}
 
 func init() {
+	flag.StringVar(&cmdOpts.connStr, "db", "", "Database connection string")
 	flag.BoolVar(&cmdOpts.showVersion, "version", false, "Show version")
 	flag.StringVar(&cmdOpts.codaBin, "coda-bin", "coda", "Full path to Coda binary")
 	flag.BoolVar(&cmdOpts.ledgerEnabled, "ledger-enabled", true, "Enable staking ledger dump endpoint")
-	flag.BoolVar(&cmdOpts.corsEnabled, "cors-enabled", true, "Enable CORS on the server")
+	flag.BoolVar(&cmdOpts.corsEnabled, "cors-enabled", false, "Enable CORS on the server")
+	flag.BoolVar(&cmdOpts.debug, "debug", false, "Enable debug mode")
 	flag.Parse()
+
+	if cmdOpts.connStr == "" {
+		cmdOpts.connStr = os.Getenv("DATABASE_URL")
+	}
+
+	if !cmdOpts.debug {
+		cmdOpts.debug = os.Getenv("DEBUG") == "1"
+	}
 
 	gin.SetMode(gin.ReleaseMode)
 }
@@ -38,19 +50,25 @@ func main() {
 		return
 	}
 
+	if cmdOpts.debug {
+		log.Println("using database connection string:", cmdOpts.connStr)
+	}
+
 	log.Println("connecting to database...")
-	conn, err := gorm.Open("postgres", os.Getenv("DATABASE_URL"))
+	conn, err := gorm.Open("postgres", cmdOpts.connStr)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("connection failed: ", err)
 	}
 	defer conn.Close()
 
 	// Enable full SQL queries in the logs
-	conn.LogMode(os.Getenv("TRACE_SQL") == "1")
+	conn.LogMode(cmdOpts.debug)
 
 	router := gin.Default()
 
 	if cmdOpts.corsEnabled {
+		log.Println("CORS is enabled")
+
 		router.Use(func(c *gin.Context) {
 			c.Header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
 			c.Header("Access-Control-Expose-Headers", "*")
@@ -70,6 +88,8 @@ func main() {
 	router.GET("/public_keys/:id", handlePublicKey(conn))
 
 	if cmdOpts.ledgerEnabled {
+		log.Println("staking ledger endpoint is enabled")
+
 		router.GET("/staking_ledger", handleStakingLedger(cmdOpts.codaBin))
 	}
 
