@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
@@ -59,6 +60,10 @@ func main() {
 	if err != nil {
 		log.Fatal("connection failed: ", err)
 	}
+
+	conn.DB().SetConnMaxIdleTime(time.Minute * 10)
+	conn.DB().SetConnMaxLifetime(time.Minute * 60)
+
 	defer conn.Close()
 
 	// Enable full SQL queries in the logs
