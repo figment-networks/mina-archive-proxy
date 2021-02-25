@@ -14,7 +14,7 @@ type blocksParams struct {
 func parseBlockParams(c *gin.Context) *blocksParams {
 	params := &blocksParams{}
 	if err := c.Bind(params); err != nil {
-		c.AbortWithStatusJSON(400, gin.H{"error": err})
+		c.AbortWithStatusJSON(400, gin.H{"error": err.Error()})
 		return nil
 	}
 
