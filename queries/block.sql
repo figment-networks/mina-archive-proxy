@@ -72,7 +72,7 @@ SELECT
       ON fee_payer_balances.id = blocks_user_commands.fee_payer_balance
     INNER JOIN balances sender_balances
       ON sender_balances.id = blocks_user_commands.source_balance
-    INNER JOIN balances receiver_balances
+    LEFT JOIN balances receiver_balances
       ON receiver_balances.id = blocks_user_commands.receiver_balance
     WHERE
       blocks_user_commands.block_id = blocks.id
