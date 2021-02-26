@@ -92,13 +92,19 @@ func handlePublicKey(conn *gorm.DB) gin.HandlerFunc {
 
 func handleStatus(conn *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		data := gin.H{
+			"healthy": true,
+			"version": version,
+		}
+
 		err := conn.Exec("SELECT 1").Error
 		if err != nil {
 			log.Println("db connection test error:", err)
-			c.AbortWithStatusJSON(500, gin.H{"healthy": false})
+			data["healthy"] = false
+			c.AbortWithStatusJSON(500, data)
 			return
 		}
-		c.JSON(200, gin.H{"healthy": true})
+		c.JSON(200, data)
 	}
 }
 
