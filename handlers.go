@@ -104,11 +104,13 @@ func handleStatus(conn *gorm.DB) gin.HandlerFunc {
 
 func handleStakingLedger(codaBinPath string) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		ledgerType := c.Query("type")
-		if ledgerType == "" {
-			ledgerType = "current"
-		}
-		if !(ledgerType == "current" || ledgerType == "next") {
+		ledger := "staking-epoch-ledger"
+
+		switch c.Query("type") {
+		case "next":
+			ledger = "next-staking-epoch-ledger"
+		case "":
+		default:
 			c.AbortWithStatusJSON(400, gin.H{"error": "invalid ledger type"})
 			return
 		}
@@ -118,7 +120,7 @@ func handleStakingLedger(codaBinPath string) gin.HandlerFunc {
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
 		defer cancel()
 
-		cmd := exec.CommandContext(ctx, codaBinPath, "advanced", "dump-staking-ledger", ledgerType, "-json")
+		cmd := exec.CommandContext(ctx, codaBinPath, "ledger", "export", ledger)
 		cmd.Stderr = os.Stderr
 		cmd.Stdout = ledgerbuf
 
