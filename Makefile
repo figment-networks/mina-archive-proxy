@@ -4,7 +4,7 @@ build: queries
 	go build
 
 test:
-	go test ./...
+	go test -cover -race
 
 queries:
 	sqlembed -path=./queries -package=queries > ./queries/queries.go
