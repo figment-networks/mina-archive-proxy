@@ -25,7 +25,7 @@ var cmdOpts = struct {
 	debug         bool
 }{}
 
-func init() {
+func initFlags() {
 	flag.StringVar(&cmdOpts.connStr, "db", "", "Database connection string")
 	flag.BoolVar(&cmdOpts.showVersion, "version", false, "Show version")
 	flag.StringVar(&cmdOpts.codaBin, "coda-bin", "coda", "Full path to Coda binary")
@@ -46,6 +46,8 @@ func init() {
 }
 
 func main() {
+	initFlags()
+
 	if cmdOpts.showVersion {
 		fmt.Println(version)
 		return
