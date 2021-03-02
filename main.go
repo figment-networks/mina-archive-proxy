@@ -18,7 +18,7 @@ const (
 
 var cmdOpts = struct {
 	connStr       string
-	codaBin       string
+	minaBin       string
 	ledgerEnabled bool
 	corsEnabled   bool
 	showVersion   bool
@@ -28,7 +28,7 @@ var cmdOpts = struct {
 func initFlags() {
 	flag.StringVar(&cmdOpts.connStr, "db", "", "Database connection string")
 	flag.BoolVar(&cmdOpts.showVersion, "version", false, "Show version")
-	flag.StringVar(&cmdOpts.codaBin, "coda-bin", "coda", "Full path to Coda binary")
+	flag.StringVar(&cmdOpts.minaBin, "mina-bin", "coda", "Full path to Coda binary")
 	flag.BoolVar(&cmdOpts.ledgerEnabled, "ledger-enabled", true, "Enable staking ledger dump endpoint")
 	flag.BoolVar(&cmdOpts.corsEnabled, "cors-enabled", false, "Enable CORS on the server")
 	flag.BoolVar(&cmdOpts.debug, "debug", false, "Enable debug mode")
@@ -97,7 +97,7 @@ func main() {
 	if cmdOpts.ledgerEnabled {
 		log.Println("staking ledger endpoint is enabled")
 
-		router.GET("/staking_ledger", handleStakingLedger(cmdOpts.codaBin))
+		router.GET("/staking_ledger", handleStakingLedger(cmdOpts.minaBin))
 	}
 
 	listenAddr := os.Getenv("PORT")

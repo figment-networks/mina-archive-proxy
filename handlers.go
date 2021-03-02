@@ -108,7 +108,7 @@ func handleStatus(conn *gorm.DB) gin.HandlerFunc {
 	}
 }
 
-func handleStakingLedger(codaBinPath string) gin.HandlerFunc {
+func handleStakingLedger(minaBinPath string) gin.HandlerFunc {
 	types := map[string]string{
 		"staged":  "staged-ledger",
 		"next":    "next-epoch-ledger",
@@ -116,8 +116,6 @@ func handleStakingLedger(codaBinPath string) gin.HandlerFunc {
 	}
 
 	return func(c *gin.Context) {
-		log.Println("=>", c.Query("type"))
-
 		ledger := c.Query("type")
 		if ledger == "" {
 			ledger = "current"
@@ -135,7 +133,7 @@ func handleStakingLedger(codaBinPath string) gin.HandlerFunc {
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
 		defer cancel()
 
-		cmd := exec.CommandContext(ctx, codaBinPath, "ledger", "export", ledger)
+		cmd := exec.CommandContext(ctx, minaBinPath, "ledger", "export", ledger)
 		cmd.Stderr = os.Stderr
 		cmd.Stdout = ledgerbuf
 
