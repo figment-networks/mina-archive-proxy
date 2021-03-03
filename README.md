@@ -14,8 +14,6 @@ Output:
 
 ```bash
 Usage of ./mina-archive-proxy:
-  -coda-bin string
-    	Full path to Coda binary (default "coda")
   -cors-enabled
     	Enable CORS on the server
   -db string
@@ -24,6 +22,8 @@ Usage of ./mina-archive-proxy:
     	Enable debug mode
   -ledger-enabled
     	Enable staking ledger dump endpoint (default true)
+  -mina-bin string
+    	Full path to Coda binary (default "coda")
   -version
     	Show version
 ```
