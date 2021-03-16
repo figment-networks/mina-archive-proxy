@@ -28,7 +28,7 @@ var cmdOpts = struct {
 func initFlags() {
 	flag.StringVar(&cmdOpts.connStr, "db", "", "Database connection string")
 	flag.BoolVar(&cmdOpts.showVersion, "version", false, "Show version")
-	flag.StringVar(&cmdOpts.minaBin, "mina-bin", "coda", "Full path to Coda binary")
+	flag.StringVar(&cmdOpts.minaBin, "mina-bin", "mina", "Full path to Mina binary")
 	flag.BoolVar(&cmdOpts.ledgerEnabled, "ledger-enabled", true, "Enable staking ledger dump endpoint")
 	flag.BoolVar(&cmdOpts.corsEnabled, "cors-enabled", false, "Enable CORS on the server")
 	flag.BoolVar(&cmdOpts.debug, "debug", false, "Enable debug mode")
