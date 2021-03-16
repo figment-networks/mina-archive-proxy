@@ -97,7 +97,12 @@ func main() {
 	if cmdOpts.ledgerEnabled {
 		log.Println("staking ledger endpoint is enabled")
 
-		router.GET("/staking_ledger", handleStakingLedger(cmdOpts.minaBin))
+		ledgerHandler, err := initStakingLedgerHandler(cmdOpts.minaBin)
+		if err != nil {
+			log.Fatal("cant init ledger handler:", err)
+		}
+
+		router.GET("/staking_ledger", ledgerHandler)
 	}
 
 	listenAddr := os.Getenv("PORT")

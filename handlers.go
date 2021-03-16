@@ -108,6 +108,17 @@ func handleStatus(conn *gorm.DB) gin.HandlerFunc {
 	}
 }
 
+func initStakingLedgerHandler(minaBinPath string) (gin.HandlerFunc, error) {
+	// Check if we have Mina CLI at the given path
+	out, err := exec.Command(minaBinPath, "version").Output()
+	if err != nil {
+		return nil, err
+	}
+	log.Printf("mina cli check: %s\n", out)
+
+	return handleStakingLedger(minaBinPath), nil
+}
+
 func handleStakingLedger(minaBinPath string) gin.HandlerFunc {
 	types := map[string]string{
 		"staged":  "staged-ledger",

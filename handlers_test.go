@@ -14,6 +14,13 @@ func TestStakingLedger(t *testing.T) {
 	router := gin.Default()
 	router.GET("/staking_ledger", handleStakingLedger("echo"))
 
+	t.Run("check CLI presense", func(t *testing.T) {
+		handler, err := initStakingLedgerHandler("foobar")
+
+		assert.Equal(t, `exec: "foobar": executable file not found in $PATH`, err.Error())
+		assert.Nil(t, handler)
+	})
+
 	t.Run("returns current ledger", func(t *testing.T) {
 		req, _ := http.NewRequest("GET", "/staking_ledger", nil)
 		writer := httptest.NewRecorder()
